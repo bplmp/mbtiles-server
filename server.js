@@ -1,22 +1,13 @@
-var express = require("express"),
-    app = express(),
-    MBTiles = require('mbtiles');
-
-if (process.argv.length < 3) {
-  console.log("Error! Missing TILES filename.\nUsage: node server.js TILES [PORT]");
-  process.exit(1);
-}
+var express = require("express");
+var app = express();
+var MBTiles = require('mbtiles');
 
 var port = 3000;
-if (process.argv.length === 4) {
-  port = parseInt(process.argv[3]);
-}
 
-var mbtilesLocation = String(process.argv[2]).replace(/\.mbtiles/,'') + '.mbtiles';
-
-new MBTiles(mbtilesLocation, function(err, mbtiles) {
-  if (err) throw err;
-  app.get('/:z/:x/:y.*', function(req, res) {
+app.get('/tiles/:tileName/:z/:x/:y.*', function (req, res) {
+  var mbtilesLocation = 'tiles/' + req.params.tileName + '.mbtiles';
+  new MBTiles(mbtilesLocation, function(err, mbtiles) {
+    if (err) throw err;
     var extension = req.param(0);
     switch (extension) {
       case "png": {
@@ -43,7 +34,6 @@ new MBTiles(mbtilesLocation, function(err, mbtiles) {
       }
     }
   });
-
 });
 
 // actually create the server
